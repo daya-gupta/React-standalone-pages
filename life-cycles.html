@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <title>React sample application</title>
+    </head>
+    <body>
+        <div>This is non-react content</div>
+        <div id="root">Here comes react content</div>
+
+        <!-- step 1 - include react, react-dom, babel, redux and react-redux libraries -->
+        <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        
+        <!-- step 2 - write babel script  -->
+        <script type="text/babel">
+
+            // step 3 - create a component
+            class ToDo extends React.Component {
+                constructor(props) {
+                    console.log('in constructor..');
+                    super(props);
+                    this.state = { 
+                        salutation: 'Hello',
+                        user: props.user
+                    }
+                }
+                componentWillMount() {
+                    console.log('will mount');
+                }
+                componentDidMount() {
+                    console.log('did mount');
+                }
+                componentWillReceiveProps(props) {
+                    console.log('will receive props ', props);
+                }
+                shouldComponentUpdate(props, state) {
+                    console.log('should update ', props, state);
+                    return true;
+                }
+                componentWillUpdate() {
+                    console.log('will update');
+                }
+                componentDidUpdate() {
+                    console.log('did update');
+                }
+                componentWillUnmount() {
+                    console.log('un-mount');
+                }
+                updateUser = (e) => {
+                    const user = e.target.value;
+                    this.setState({ user });
+                }
+                render() {
+                    console.log('in render..');
+                    return (
+                        <div>
+                            <h1>{this.state.salutation} {this.state.user}, this is your ToDo list!!</h1>
+                            <input placeholder="User Name" value={this.state.user} onChange={this.updateUser} />
+                        </div>
+                    );
+                }
+            }
+
+            // step 4 - render the component - bootsrap the react application
+            const root = document.querySelector('#root');
+            ReactDOM.render(<ToDo user="Test User" />, root);
+        </script>
+    </body>
+</html>

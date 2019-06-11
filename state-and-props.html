@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>React sample application</title>
+    </head>
+    <body>
+        <div>This is non-react content</div>
+        <div id="root">Here comes react content</div>
+
+        <!-- step 1 - include react, react-dom, babel, redux and react-redux libraries -->
+        <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        
+        <!-- step 2 - write babel script  -->
+        <script type="text/babel">
+
+            // step 3 - create a component
+            class ToDo extends React.Component {
+                state = { 
+                    salutation: 'Hello'
+                }
+                render() {
+                    return (
+                        <h1>{this.state.salutation} {this.props.user}, this is your ToDo list!!</h1>
+                    );
+                }
+            }
+
+            // step 4 - render the component - bootsrap the react application
+            const root = document.querySelector('#root');
+            ReactDOM.render(<ToDo user="Test User" />, root);
+        </script>
+    </body>
+</html>

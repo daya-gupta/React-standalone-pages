@@ -1,0 +1,186 @@
+<html>
+    <head>
+        <title>React sample application</title>
+        <style>
+            .todo {
+                border: 5px double black;
+                padding: 10px;
+            }
+            .todoEdit {
+                border: 5px dashed orange;
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+            .todoList {
+                border: 5px dashed green;
+                padding: 10px;
+            }
+            ul {
+                padding: 0
+            }
+            ul li {
+                padding: 10px;
+                list-style-type: none;
+                border: 1px solid #ccc;
+            }
+            li button {
+                margin-left: 20px;
+                font-weight: bold;
+                font-size: 13px;
+            }
+            li button.done {
+                color: green;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root">Here comes react content</div>
+
+        <!-- step 1 - include react, react-dom, babel, redux and react-redux libraries -->
+        <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.1/redux.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/react-redux/7.0.3/react-redux.js"></script>
+    
+
+        <!-- step 2 - write babel script  -->
+        <script type="text/babel">
+
+            // step 3 - create components
+            class TodoEdit extends React.Component {
+                state = { todo: '' }
+
+                updateTodoItem = (e) => {
+                    const todo = e.target.value;
+                    this.setState({ todo });
+                }
+
+                addToList = () => {
+                    const todo = this.state.todo;
+                    this.setState({ todo: '' });
+                    this.props.addToList(todo);
+                }
+
+                render() {
+                    console.log('render- todoEdit');
+                    return (
+                        <div className="todoEdit">
+                            <h2>Edit component</h2>
+                            <input type="text" placeholder="todo item" value={this.state.todo} onChange={this.updateTodoItem} />
+                            <button onClick={this.addToList}>Add to list</button>    
+                        </div>
+                    );
+                }
+            }
+
+            class TodoList extends React.Component {
+                renderList() {
+                    if (!this.props.list.length) {
+                        return (<div>No item found..</div>)
+                    }
+                    return (
+                        <ul>
+                            { this.props.list.map((item, index) => {
+                                const btnText = item.completed ? 'Done' : 'TBD'
+                                return (
+                                    <li key={index}>
+                                        <span>{item.todo}</span>
+                                        <button className={btnText} onClick={() => this.props.toggleStatus(index)}>{btnText}</button>
+                                    </li>
+                                );
+                            }) }
+                        </ul>
+                    );
+                }
+                render() {
+                    console.log('render- todoList');
+                    return (
+                        <div className="todoList">
+                            <h2>List component</h2>
+                            { this.renderList() }
+                        </div>
+                    );
+                }
+            }
+
+            class Todo extends React.Component {
+                constructor(props) {
+                    super(props);
+                    this.state = { 
+                        salutation: 'Hello',
+                        // list: []
+                    }
+                }
+                addToList = (todo) => {
+                    // const list = [...this.state.list];
+                    // list.push({ todo, completed: false });
+                    // this.setState({ list });
+                    
+                    const list = this.props.list;
+                    list.push({ todo, completed: false });
+                    this.props.updateList(list);
+                }
+                toggleStatus = (index) => {
+                    // const list = [...this.state.list];
+                    // list[index].completed = !list[index].completed;
+                    // this.setState({ list });
+
+                    const list = this.props.list;
+                    list[index].completed = !list[index].completed;
+                    this.props.updateList(list)
+                }
+                render() {
+                    console.log('render - todo');
+                    return (
+                        <div className="todo">
+                            <h1>{this.state.salutation} {this.props.user || 'user'}, this is your Todo list!!</h1>
+                            <TodoEdit addToList={this.addToList} />
+                            <TodoList list={this.props.list} toggleStatus={this.toggleStatus} />
+                        </div>
+                    );
+                }
+            }
+
+            // step 4 - connect component to redux store
+            const mapStateToProps = (state) => {
+                return {
+                    list: state.list
+                }
+            }
+            const mapDispatchToProps = (dispatch) => {
+                return {
+                    updateList: (list) => { dispatch({ type: 'UPDATE_LIST', data: list }) }
+                }
+            }
+            Todo = ReactRedux.connect(mapStateToProps, mapDispatchToProps)(Todo);
+
+            // step 4 - set-up store
+            const reducerInitialState = {
+                list: [
+                    { todo: 'shopping', completed: false },
+                    { todo: 'cooking', completed: false }
+                ]
+            }
+            function fn_reducer(state=reducerInitialState, action) {
+                switch(action.type) {
+                    case 'UPDATE_LIST': {
+                        const newState = { ...state, list: [...action.data] };
+                        return newState;
+                    }
+                    default: return state;
+                }
+            }
+            const reduxStore = Redux.createStore(fn_reducer);
+
+            // step 5 - render the component - bootsrap the react application
+            const root = document.querySelector('#root');
+            ReactDOM.render(
+                <ReactRedux.Provider store={reduxStore}>
+                    <Todo user="" />
+                </ReactRedux.Provider>, root
+            );
+        </script>
+    </body>
+</html>
